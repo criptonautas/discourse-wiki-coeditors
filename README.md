@@ -38,6 +38,7 @@ site-wide.
 | `excluded_users` | — | Usernames never credited. See *Removing someone* below. |
 | `label_overrides` | — | Per-category wording. Categories not listed use `label`. |
 | `max_avatars` | `5` | Avatars shown before the rest go behind a `+N more` disclosure. |
+| `max_revisions` | `20` | Recent revisions read, one request each. Up to 40. |
 
 Ships with English and Spanish translations (`locales/en.yml`, `locales/es.yml`),
 covering both the setting descriptions and the default label
@@ -62,7 +63,8 @@ every language.
 - Past `max_avatars`, the remainder goes behind a native `<details>`
   disclosure labelled `+N more`. No JavaScript state, no modal — clicking it
   reveals the rest in place.
-- The post's own author is excluded — nobody co-authors their own post.
+- The post's own author is excluded — nobody co-authors their own post — and so
+  are core's `system` and `discobot`. Other bots can go in `excluded_users`.
 - Clicking an avatar opens the member's **profile card**. Each link is core's
   `DUserLink`, which emits the `data-user-card` attribute core's click handler
   watches for, builds the profile href, and respects
@@ -103,7 +105,10 @@ and Discourse handles it everywhere at once.
 ### Known limits
 
 - One request per revision, each computing a server-side diff that is thrown
-  away. Capped at 50 revisions. A post with dozens of edits makes dozens of
+  away. Only the most recent revisions are read (`max_revisions`, 20 by default),
+  so the list credits who keeps the wiki current; earlier editors of a heavily
+  edited post drop off. The cap is 40 because Discourse blocks a visitor's IP
+  past 50 requests in 10 seconds by default, and the page needs some of its own. A post with dozens of edits makes dozens of
   requests; if that becomes normal on your site, the aggregation belongs in a
   plugin that caches contributor ids in a post custom field on revision
   create.

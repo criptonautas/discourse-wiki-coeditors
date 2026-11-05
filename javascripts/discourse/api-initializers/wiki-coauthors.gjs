@@ -6,18 +6,22 @@ import { i18n } from "discourse-i18n";
 import DAsyncContent from "discourse/ui-kit/d-async-content";
 import DUserLink from "discourse/ui-kit/d-user-link";
 
-// Core's revision serializer only ever reports the last 99 revisions, so stay
-// under that and keep the request burst bounded however edited a post is.
-//
-// One request per revision, each one computing a server-side diff we
-// throw away. Fine for the handful of edits a co-authored wiki post collects.
-// If posts get heavily edited, move the aggregation into a plugin that caches
-// contributor ids in a post custom field when a revision is created.
-const MAX_REVISIONS = 50;
+// One request per revision, each computing a server-side diff we throw away,
+// and the most recent ones are read: the list credits who keeps the wiki current.
+// Capped at 40 because core blocks an IP past 50 requests in 10 seconds by
+// default (max_reqs_per_ip_per_10_seconds), and the page itself needs some.
+// Heavier use belongs in a plugin that caches contributor ids per post.
+const maxRevisions = Math.min(
+  40,
+  Math.max(1, parseInt(settings.max_revisions, 10) || 20)
+);
 
 // Kept in step with --wiki-coauthors-avatar-size in common.scss: the CSS sizes
 // the box, this picks the image fetched into it.
 const AVATAR_SIZE = 30;
+
+// Core's own automated users: edits they make are not co-authorship.
+const AUTOMATED_USERS = ["system", "discobot"];
 
 // A display filter, not a removal: the revisions stay in the database and stay
 // visible in the post's own history modal. Serializer usernames are lowercased,
@@ -54,9 +58,9 @@ async function fetchEditors(post) {
 
   const numbers = [];
   for (
-    let number = latest.first_revision;
-    number < latest.last_revision && numbers.length < MAX_REVISIONS;
-    number++
+    let number = latest.last_revision - 1;
+    number >= latest.first_revision && numbers.length < maxRevisions;
+    number--
   ) {
     numbers.push(number);
   }
@@ -71,10 +75,15 @@ async function fetchEditors(post) {
     .concat(latest)
     .sort((a, b) => a.current_revision - b.current_revision);
 
-  // Skipped outright: the post's own author (nobody co-authors their own post)
-  // and the excluded usernames. `username` is already lowercased by the
-  // serializer.
-  const skip = new Set([(post.username || "").toLowerCase(), ...excludedUsers]);
+  // Skipped outright: the post's own author (nobody co-authors their own post),
+  // core's automated users and the excluded usernames. The revision serializer
+  // has no user id, so other bots go through `excluded_users`. `username` is
+  // already lowercased by the serializer.
+  const skip = new Set([
+    (post.username || "").toLowerCase(),
+    ...AUTOMATED_USERS,
+    ...excludedUsers,
+  ]);
 
   const counts = new Map();
 

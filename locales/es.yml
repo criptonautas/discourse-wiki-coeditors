@@ -7,6 +7,7 @@ es:
       label: "Texto que aparece antes de los nombres de los coeditores. Vacío usa el idioma de quien lee."
       excluded_users: "Usuarios que nunca se acreditan en la lista. Solo es un filtro de visualización: sus ediciones siguen en el historial del post."
       max_avatars: "Cuántos avatares se muestran antes de que el resto pase a un desplegable."
+      max_revisions: "Cuántas revisiones recientes leer, una petición cada una. Hasta 40, para no pasar el límite por defecto de Discourse de 50 peticiones por visitante en 10 segundos."
       label_overrides:
         description: "Texto por categoría, que reemplaza la etiqueta de arriba. Las categorías no listadas la conservan."
         schema:

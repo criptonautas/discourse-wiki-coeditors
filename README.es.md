@@ -37,6 +37,7 @@ en todo el sitio.
 | `excluded_users` | — | Nombres de usuario que nunca se acreditan. Ver *Quitar a alguien* más abajo. |
 | `label_overrides` | — | Texto por categoría. Las categorías no listadas usan `label`. |
 | `max_avatars` | `5` | Avatares mostrados antes de que el resto pase a un desplegable `+N más`. |
+| `max_revisions` | `20` | Revisiones recientes que se leen, una petición cada una. Hasta 40. |
 
 Incluye traducciones al inglés y al español (`locales/en.yml`, `locales/es.yml`),
 que cubren tanto las descripciones de los ajustes como la etiqueta por defecto
@@ -61,7 +62,8 @@ todos los idiomas.
 - Pasado `max_avatars`, el resto va detrás de un `<details>` nativo
   con la etiqueta `+N más`. Sin estado de JavaScript, sin modal: al hacer clic
   se muestra el resto en el mismo lugar.
-- El autor del propio post se excluye: nadie es coautor de su propio post.
+- El autor del propio post se excluye, porque nadie es coautor de su propio post, y
+  también `system` y `discobot` del núcleo. Otros bots pueden ir en `excluded_users`.
 - Al hacer clic en un avatar se abre la **tarjeta de perfil** del miembro. Cada enlace es el
   `DUserLink` del núcleo, que emite el atributo `data-user-card` que busca el manejador de
   clics del núcleo, construye el enlace al perfil y respeta
@@ -102,7 +104,10 @@ y Discourse lo gestiona en todas partes a la vez.
 ### Límites conocidos
 
 - Una petición por revisión, cada una calculando un diff en el servidor que se
-  descarta. Limitado a 50 revisiones. Un post con decenas de ediciones hace decenas de
+  descarta. Solo se leen las revisiones más recientes (`max_revisions`, 20 por defecto),
+  así la lista reconoce a quien mantiene el wiki al día; en un post muy editado, los
+  primeros editores quedan fuera. El tope es 40 porque Discourse bloquea por defecto la
+  IP de quien pasa de 50 peticiones en 10 segundos, y la página necesita algunas propias. Un post con decenas de ediciones hace decenas de
   peticiones; si eso se vuelve habitual en tu sitio, la agregación debería estar en un
   plugin que guarde en caché los ids de colaboradores en un campo personalizado del post al crear
   la revisión.

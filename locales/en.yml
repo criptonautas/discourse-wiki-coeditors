@@ -7,6 +7,7 @@ en:
       label: "Text shown before the co-editor names. Empty uses the viewer's own language."
       excluded_users: "Usernames never credited in the list. A display filter only: their edits stay in the post's history."
       max_avatars: "How many avatars to show before the rest go behind a disclosure."
+      max_revisions: "How many recent revisions to read, one request each. Up to 40, to stay under Discourse's default limit of 50 requests per visitor in 10 seconds."
       label_overrides:
         description: "Per-category wording, overriding the label above. Categories not listed keep it."
         schema:

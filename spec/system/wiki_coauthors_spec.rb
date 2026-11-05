@@ -62,6 +62,15 @@ RSpec.describe "Wiki co-authors" do
     expect(listed_coauthors).to eq(%w[first_editor])
   end
 
+  it "never credits the system user" do
+    post = wiki_post_in(target_category, editors: [Discourse.system_user, first_editor])
+
+    visit_post(post)
+
+    expect(page).to have_css(".wiki-coauthors")
+    expect(listed_coauthors).to eq(%w[first_editor])
+  end
+
   it "never credits an excluded user" do
     component.update_setting(:excluded_users, "second_editor")
     component.save!

@@ -1,7 +1,7 @@
-# Wiki Co-authors — agent guide
+# Wiki Co-editors — agent guide
 
 Rules for anyone changing this repo, people and AI agents alike. Org-wide
-conventions (README, licenses, commits) are in the [contributing guide](https://github.com/somos-criptonautas/.github/blob/main/CONTRIBUTING.md).
+conventions (README, licenses, commits) are in the [contributing guide](https://github.com/criptonautas/.github/blob/main/CONTRIBUTING.md).
 
 ## Checks
 
@@ -17,7 +17,8 @@ when the UI changes.
 ## Things that are easy to get wrong
 
 - The list is built from `/posts/{id}/revisions/{n}.json`, one request per
-  revision, capped by `MAX_REVISIONS`. Anything that adds requests per post
+  revision, capped by `max_revisions` (at most 40, under core's 50 requests per IP per
+  10 seconds) and read from the most recent backwards. Anything that adds requests per post
   belongs in a plugin, not here.
 - Wiki edit history is public whatever `edit_history_visible_to_public` says,
   which is why anonymous visitors see the list. Keep a spec for it.
